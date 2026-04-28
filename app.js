@@ -211,6 +211,7 @@
   if (document.getElementById('assessment-form')) {
 const form = document.getElementById("assessment-form");
     const progress = document.getElementById("form-progress");
+    const progressWrap = document.querySelector(".progress-wrap");
     const toast = document.getElementById("toast");
     const steps = Array.from(document.querySelectorAll(".section[data-step]"));
     const stepDots = Array.from(document.querySelectorAll(".step-dot"));
@@ -286,6 +287,32 @@ const form = document.getElementById("assessment-form");
       previewBmi.textContent = isFinite(bmi) ? bmi.toFixed(1) : "-";
     }
 
+    function showSubmittedState() {
+      if (progressWrap) progressWrap.style.display = "none";
+      toast.classList.remove("show");
+
+      form.innerHTML = `
+        <section class="assessment-success" role="status" aria-live="polite">
+          <p class="assessment-success-kicker">Assessment Submitted</p>
+          <h2>Thank you. Your details have been received.</h2>
+          <p>Redirecting you to the main page in <b id="redirect-countdown">3</b> seconds...</p>
+          <a class="btn btn-main" href="index.html">Go now</a>
+        </section>
+      `;
+
+      const countdownEl = document.getElementById("redirect-countdown");
+      let secondsLeft = 3;
+      const countdownInterval = setInterval(() => {
+        secondsLeft -= 1;
+        if (countdownEl) countdownEl.textContent = String(Math.max(0, secondsLeft));
+        if (secondsLeft <= 0) clearInterval(countdownInterval);
+      }, 1000);
+
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 3000);
+    }
+
     prevBtn.addEventListener("click", () => {
       activeStep = clamp(activeStep - 1, 1, maxStep);
       updateStepUI();
@@ -318,13 +345,7 @@ const form = document.getElementById("assessment-form");
         return;
       }
 
-      showToast("Assessment received. We will contact you soon.", true);
-      setTimeout(() => {
-        form.reset();
-        activeStep = 1;
-        updateStepUI();
-        updateBodyPreview();
-      }, 900);
+      showSubmittedState();
     });
 
     updateStepUI();
