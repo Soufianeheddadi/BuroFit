@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>buroFit Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0a;
+      --card: #111111;
+      --border: #232323;
+      --muted: #909090;
+      --text: #f5f5f5;
+      --red: #FF2D00;
+      --red-soft: #ff7759;
+      --green: #22c55e;
+    }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 360px at 10% -10%, rgba(255,45,0,.16) 0%, transparent 60%),
+        radial-gradient(900px 360px at 90% -20%, rgba(255,45,0,.1) 0%, transparent 58%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Inter", sans-serif;
+      line-height: 1.5;
+      padding: 34px 18px 48px;
+    }
+    .shell {
+      max-width: 1020px;
+      margin: 0 auto;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #111 0%, #0d0d0d 100%);
+      box-shadow: 0 28px 80px rgba(0,0,0,.55);
+      overflow: hidden;
+    }
+    .top {
+      padding: 26px 24px 18px;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      gap: 10px;
+    }
+    .brand {
+      font-family: "Bebas Neue", sans-serif;
+      letter-spacing: 2px;
+      font-size: 30px;
+      text-decoration: none;
+      color: #fff;
+      width: fit-content;
+    }
+    .brand span { color: var(--red); }
+    .kicker { font-size: 11px; letter-spacing: 1.1px; text-transform: uppercase; color: var(--red-soft); }
+    .title {
+      font-family: "Bebas Neue", sans-serif;
+      letter-spacing: .8px;
+      line-height: .94;
+      font-size: clamp(40px, 6vw, 62px);
+      max-width: 760px;
+    }
+    .title .accent { color: var(--red); }
+    .sub { color: #c7c7c7; font-size: 14px; max-width: 800px; }
+
+    .progress-wrap {
+      height: 4px;
+      background: #1b1b1b;
+      border-top: 1px solid #171717;
+      border-bottom: 1px solid #171717;
+    }
+    .progress {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--red-soft) 0%, var(--red) 70%);
+      transition: width .2s ease;
+    }
+
+    form { padding: 24px; }
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .step-dot {
+      border: 1px solid var(--border);
+      background: #101010;
+      color: #818181;
+      font-size: 11px;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      padding: 9px 8px;
+      text-align: center;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .step-dot.active {
+      border-color: #5a261a;
+      color: #fff;
+      background: #1b110f;
+    }
+    .wizard-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .preview-panel {
+      position: sticky;
+      top: 16px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #121212 0%, #0e0e0e 100%);
+      min-height: 420px;
+      padding: 14px;
+      overflow: hidden;
+    }
+    .preview-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--red-soft);
+      margin-bottom: 6px;
+    }
+    .preview-title {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 34px;
+      line-height: .95;
+      letter-spacing: .5px;
+    }
+    .preview-stage {
+      margin-top: 10px;
+      border: 1px solid #212121;
+      background:
+        radial-gradient(circle at 50% 8%, rgba(255,45,0,.2) 0%, transparent 58%),
+        linear-gradient(180deg, #111 0%, #0b0b0b 100%);
+      height: 266px;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .preview-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 22px 22px;
+      opacity: .35;
+      pointer-events: none;
+    }
+    .avatar-glow {
+      position: absolute;
+      left: 50%;
+      bottom: 30px;
+      width: 170px;
+      height: 170px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,45,0,.24) 0%, rgba(255,45,0,.04) 55%, transparent 75%);
+      filter: blur(8px);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .preview-floor {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 18px;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #5c5c5c, transparent);
+      z-index: 1;
+    }
+    .avatar {
+      position: absolute;
+      left: 50%;
+      bottom: 20px;
+      width: 170px;
+      height: 220px;
+      transform-origin: bottom center;
+      transform: translateX(-50%) scale(1, 1);
+      transition: transform .28s ease;
+      z-index: 2;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,.5));
+    }
+    .silhouette {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 132px;
+      height: 132px;
+      transform: translate(-50%, -50%);
+      transition: transform .28s ease, opacity .28s ease;
+      color: #ff5f39;
+      opacity: .95;
+      filter: drop-shadow(0 0 14px rgba(255,45,0,.26));
+    }
+    .preview-stats {
+      margin-top: 10px;
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      color: #bdbdbd;
+    }
+    .preview-stats b { color: #fff; }
+
+    .wizard-stage { display: grid; gap: 14px; }
+    .section { display: none; gap: 14px; }
+    .section.active { display: grid; }
+    .section h3 {
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--red-soft);
+      font-weight: 700;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+    .field { display: grid; gap: 7px; }
+    label { font-size: 11px; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #0d0d0d;
+      color: #fff;
+      padding: 12px 12px;
+      font-size: 13px;
+      font-family: "Inter", sans-serif;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(255,45,0,.12);
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .check {
+      border: 1px solid var(--border);
+      background: #101010;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      color: #d7d7d7;
+    }
+    .check input { width: 15px; height: 15px; accent-color: var(--red); }
+
+    .actions {
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+    .wizard-nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+    .hint { font-size: 12px; color: var(--muted); }
+    .btn {
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      padding: 13px 20px;
+      transition: transform .2s, background .2s;
+    }
+    .btn-main { background: var(--red); color: #fff; }
+    .btn-main:hover { background: #e03712; transform: translateY(-1px); }
+    .btn-ghost { border: 1px solid #3a3a3a; color: #e8e8e8; background: transparent; }
+    .btn-ghost:hover { border-color: #565656; }
+    .btn[disabled] { opacity: .5; pointer-events: none; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      background: #171717;
+      border: 1px solid #2e2e2e;
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 12px;
+      transition: opacity .25s, transform .25s;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast b { color: var(--green); }
+
+    @media (max-width: 900px) {
+      .stepper { grid-template-columns: 1fr 1fr; }
+      .wizard-layout { grid-template-columns: 1fr; }
+      .preview-panel { position: static; min-height: auto; }
+      .preview-stage { height: 220px; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .check-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; align-items: stretch; }
+      .btn { width: 100%; }
+      .wizard-nav { width: 100%; justify-content: space-between; }
+      .wizard-nav .btn { width: auto; flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <a class="brand" href="index.html">buro<span>Fit</span></a>
+      <p class="kicker">Athlete Intake Form</p>
+      <h1 class="title">BUILD YOUR <span class="accent">PERSONALIZED</span> TRAINING PLAN</h1>
+      <p class="sub">Fill this 2-minute assessment so we can create the right training split, nutrition direction, and coaching intensity for your exact profile.</p>
+    </header>
+
+    <div class="progress-wrap"><div class="progress" id="form-progress"></div></div>
+
+    <form id="assessment-form">
+      <div class="stepper" id="stepper">
+        <div class="step-dot active">1. Profile</div>
+        <div class="step-dot">2. Body</div>
+        <div class="step-dot">3. Goals</div>
+        <div class="step-dot">4. Training</div>
+        <div class="step-dot">5. Recovery</div>
+      </div>
+
+      <div class="wizard-layout">
+        <aside class="preview-panel">
+          <p class="preview-label">Live Body Preview</p>
+          <h2 class="preview-title">YOUR CURRENT<br>PROFILE</h2>
+          <div class="preview-stage">
+            <div class="avatar-glow"></div>
+            <div class="avatar" id="avatar">
+              <svg id="silhouette-base" class="silhouette" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M8 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M6 6.75v8.5a.75.75 0 0 0 1.5 0V10.5a.5.5 0 0 1 1 0v4.75a.75.75 0 0 0 1.5 0v-8.5a.25.25 0 1 1 .5 0v2.5a.75.75 0 0 0 1.5 0V6.5a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v2.75a.75.75 0 0 0 1.5 0v-2.5a.25.25 0 0 1 .5 0"/>
+              </svg>
+            </div>
+            <div class="preview-floor"></div>
+          </div>
+          <div class="preview-stats">
+            <span>Height: <b id="preview-height">170 cm</b></span>
+            <span>Weight: <b id="preview-weight">70.0 kg</b></span>
+            <span>BMI Estimate: <b id="preview-bmi">24.2</b></span>
+          </div>
+        </aside>
+
+        <div class="wizard-stage">
+      <section class="section active" data-step="1">
+        <h3>Basic Profile</h3>
+        <div class="grid-2">
+          <div class="field">
+            <label for="full-name">Full Name</label>
+            <input id="full-name" name="fullName" type="text" placeholder="Your full name" required>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@email.com" required>
+          </div>
+          <div class="field">
+            <label for="age">Age</label>
+            <input id="age" name="age" type="number" min="13" max="90" placeholder="e.g. 27" required>
+          </div>
+          <div class="field">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+              <option value="">Select</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" data-step="2">
+        <h3>Body Metrics</h3>
+        <div class="grid-3">
+          <div class="field">
+            <label for="height">Height (cm)</label>
+            <input id="height" name="height" type="number" min="120" max="240" placeholder="e.g. 178" required>
+          </div>
+          <div class="field">
+            <label for="weight">Weight (kg)</label>
+            <input id="weight" name="weight" type="number" min="35" max="250" step="0.1" placeholder="e.g. 79.5" required>
+          </div>
+          <div class="field">
+            <label for="body-fat">Body Fat % (optional)</label>
+            <input id="body-fat" name="bodyFat" type="number" min="3" max="60" step="0.1" placeholder="e.g. 18.5">
+          </div>
+        </div>
+      </section>
+
+      <section class="section" data-step="3">
+        <h3>Training Goals</h3>
+        <div class="grid-2">
+          <div class="field">
+            <label for="main-goal">Main Goal</label>
+            <select id="main-goal" name="mainGoal" required>
+              <option value="">Select goal</option>
+              <option>Fat loss</option>
+              <option>Muscle gain</option>
+              <option>Strength</option>
+              <option>Body recomposition</option>
+              <option>Athletic performance</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="timeline">Target Timeline</label>
+            <select id="timeline" name="timeline" required>
+              <option value="">Select timeline</option>
+              <option>8 weeks</option>
+              <option>12 weeks</option>
+              <option>16 weeks</option>
+              <option>6+ months</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="goal-notes">Goal Notes</label>
+          <textarea id="goal-notes" name="goalNotes" placeholder="Any specific targets? (weight target, body area focus, performance targets)"></textarea>
+        </div>
+      </section>
+
+      <section class="section" data-step="4">
+        <h3>Training Setup</h3>
+        <div class="grid-3">
+          <div class="field">
+            <label for="experience">Experience Level</label>
+            <select id="experience" name="experience" required>
+              <option value="">Select level</option>
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="days">Days Per Week</label>
+            <select id="days" name="days" required>
+              <option value="">Select days</option>
+              <option>2 days</option>
+              <option>3 days</option>
+              <option>4 days</option>
+              <option>5 days</option>
+              <option>6 days</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="session">Session Length</label>
+            <select id="session" name="session" required>
+              <option value="">Select duration</option>
+              <option>30 min</option>
+              <option>45 min</option>
+              <option>60 min</option>
+              <option>75+ min</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="equipment">Equipment Access</label>
+          <select id="equipment" name="equipment" required>
+            <option value="">Select equipment</option>
+            <option>Full gym</option>
+            <option>Home gym</option>
+            <option>Basic dumbbells/bands</option>
+            <option>Bodyweight only</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="section" data-step="5">
+        <h3>Limitations & Recovery</h3>
+        <div class="check-grid">
+          <label class="check"><input type="checkbox" name="conditions" value="Lower back issue">Lower back issue</label>
+          <label class="check"><input type="checkbox" name="conditions" value="Knee pain">Knee pain</label>
+          <label class="check"><input type="checkbox" name="conditions" value="Shoulder pain">Shoulder pain</label>
+          <label class="check"><input type="checkbox" name="conditions" value="No injuries">No injuries</label>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="sleep">Average Sleep</label>
+            <select id="sleep" name="sleep" required>
+              <option value="">Select sleep</option>
+              <option>&lt; 5 hours</option>
+              <option>5-6 hours</option>
+              <option>6-7 hours</option>
+              <option>7-8 hours</option>
+              <option>8+ hours</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="stress">Stress Level</label>
+            <select id="stress" name="stress" required>
+              <option value="">Select stress</option>
+              <option>Low</option>
+              <option>Moderate</option>
+              <option>High</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" data-step="5">
+        <h3>Nutrition Preferences</h3>
+        <div class="grid-2">
+          <div class="field">
+            <label for="diet">Diet Style</label>
+            <select id="diet" name="diet" required>
+              <option value="">Select style</option>
+              <option>Balanced</option>
+              <option>High protein</option>
+              <option>Low carb</option>
+              <option>Vegetarian</option>
+              <option>Vegan</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="meals">Meals Per Day</label>
+            <select id="meals" name="meals" required>
+              <option value="">Select meals</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5+</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="notes">Extra Notes For Coach</label>
+          <textarea id="notes" name="notes" placeholder="Tell us anything important: schedule constraints, food allergies, old training plans, etc."></textarea>
+        </div>
+      </section>
+
+      <div class="actions">
+        <p class="hint">This info helps us create a safer, faster, and more personalized plan.</p>
+        <div class="wizard-nav">
+          <button class="btn btn-ghost" type="button" id="prev-step">Previous</button>
+          <button class="btn btn-main" type="button" id="next-step">Next Step</button>
+        </div>
+      </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="toast" id="toast"><b>Done:</b> Assessment received. We will contact you soon.</div>
+
+  <script>
+    const form = document.getElementById("assessment-form");
+    const progress = document.getElementById("form-progress");
+    const toast = document.getElementById("toast");
+    const steps = Array.from(document.querySelectorAll(".section[data-step]"));
+    const stepDots = Array.from(document.querySelectorAll(".step-dot"));
+    const prevBtn = document.getElementById("prev-step");
+    const nextBtn = document.getElementById("next-step");
+
+    const heightInput = document.getElementById("height");
+    const weightInput = document.getElementById("weight");
+    const avatar = document.getElementById("avatar");
+    const silhouetteBase = document.getElementById("silhouette-base");
+    const previewHeight = document.getElementById("preview-height");
+    const previewWeight = document.getElementById("preview-weight");
+    const previewBmi = document.getElementById("preview-bmi");
+
+    let activeStep = 1;
+    const maxStep = 5;
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function showToast(text, success) {
+      toast.innerHTML = (success ? "<b>Done:</b> " : "<b>Note:</b> ") + text;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function validateCurrentStep() {
+      const requiredFields = form.querySelectorAll(`.section[data-step="${activeStep}"] [required]`);
+      for (const el of requiredFields) {
+        if (!String(el.value || "").trim()) {
+          el.focus();
+          showToast("Please complete required fields before continuing.", false);
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function updateStepUI() {
+      steps.forEach(section => {
+        const sectionStep = Number(section.dataset.step);
+        section.classList.toggle("active", sectionStep === activeStep);
+      });
+
+      stepDots.forEach((dot, idx) => {
+        dot.classList.toggle("active", idx + 1 <= activeStep);
+      });
+
+      prevBtn.style.display = activeStep === 1 ? "none" : "inline-flex";
+      nextBtn.style.display = "inline-flex";
+      nextBtn.textContent = activeStep === maxStep ? "Submit Assessment" : "Next Step";
+      progress.style.width = ((activeStep / maxStep) * 100).toFixed(1) + "%";
+    }
+
+    function updateBodyPreview() {
+      const h = parseFloat(heightInput.value) || 170;
+      const w = parseFloat(weightInput.value) || 70;
+      const hNorm = clamp((h - 150) / 50, 0, 1);
+      const wNorm = clamp((w - 45) / 105, 0, 1);
+
+      const scaleY = 0.9 + (hNorm * 0.42);
+      const scaleX = 0.88 + (wNorm * 0.34);
+      avatar.style.transform = `translateX(-50%) scale(${scaleX.toFixed(3)}, ${scaleY.toFixed(3)})`;
+
+      silhouetteBase.style.transform = `translate(-50%, -50%) scale(${(0.94 + wNorm * 0.28).toFixed(3)}, ${(0.94 + hNorm * 0.18).toFixed(3)})`;
+
+      const bmi = w / Math.pow(h / 100, 2);
+      previewHeight.textContent = h.toFixed(0) + " cm";
+      previewWeight.textContent = w.toFixed(1) + " kg";
+      previewBmi.textContent = isFinite(bmi) ? bmi.toFixed(1) : "-";
+    }
+
+    prevBtn.addEventListener("click", () => {
+      activeStep = clamp(activeStep - 1, 1, maxStep);
+      updateStepUI();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (activeStep === maxStep) {
+        form.requestSubmit();
+        return;
+      }
+      if (!validateCurrentStep()) return;
+      activeStep = clamp(activeStep + 1, 1, maxStep);
+      updateStepUI();
+    });
+
+    heightInput.addEventListener("input", updateBodyPreview);
+    weightInput.addEventListener("input", updateBodyPreview);
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const allRequired = Array.from(form.querySelectorAll("[required]"));
+      const incomplete = allRequired.find(el => !String(el.value || "").trim());
+      if (incomplete) {
+        const parentStep = incomplete.closest(".section")?.dataset.step;
+        if (parentStep) activeStep = Number(parentStep);
+        updateStepUI();
+        incomplete.focus();
+        showToast("Please complete all required fields before submit.", false);
+        return;
+      }
+
+      showToast("Assessment received. We will contact you soon.", true);
+      setTimeout(() => {
+        form.reset();
+        activeStep = 1;
+        updateStepUI();
+        updateBodyPreview();
+      }, 900);
+    });
+
+    updateStepUI();
+    updateBodyPreview();
+  </script>
+</body>
+</html>
