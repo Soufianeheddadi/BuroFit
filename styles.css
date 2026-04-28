@@ -558,7 +558,11 @@ body.page-assessment {
       transition: width .2s ease;
     }
 
-    body.page-assessment form { padding: 24px; }
+    body.page-assessment form {
+      padding: 24px;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
     body.page-assessment .stepper {
       --step-node-size: 24px;
       display: grid;
@@ -644,8 +648,10 @@ body.page-assessment {
       display: grid;
       grid-template-columns: 320px minmax(460px, 680px);
       gap: 16px;
-      align-items: start;
+      align-items: center;
       justify-content: center;
+      width: min(100%, 1040px);
+      margin: 0 auto;
     }
     body.page-assessment .preview-panel {
       position: sticky;
@@ -744,7 +750,12 @@ body.page-assessment {
     }
     body.page-assessment .preview-stats b { color: #fff; }
 
-    body.page-assessment .wizard-stage { display: grid; gap: 14px; }
+    body.page-assessment .wizard-stage {
+      display: grid;
+      gap: 14px;
+      width: 100%;
+      margin: 0 auto;
+    }
     body.page-assessment .section { display: none; gap: 14px; }
     body.page-assessment .section.active { display: grid; }
     body.page-assessment .section h3 {
